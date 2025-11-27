@@ -22,7 +22,6 @@ function CorrelationTool() {
     { value: 90, label: '90日' },
     { value: 180, label: '180日' },
     { value: 365, label: '1年' },
-    { value: 730, label: '2年' }
   ];
 
   const windowOptions = [
