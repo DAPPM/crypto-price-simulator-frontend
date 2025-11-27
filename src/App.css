@@ -817,3 +817,160 @@ tr:hover td {
     justify-content: center;
   }
 }
+/* 方向一致分析 */
+.analysis-section {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.analysis-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  color: #e2e8f0;
+}
+
+.direction-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+.direction-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.direction-card.highlight {
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+}
+
+.direction-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.direction-value.green { color: #22c55e; }
+.direction-value.red { color: #ef4444; }
+
+.direction-label {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.direction-detail {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+/* 条件付き相関 */
+.conditional-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.conditional-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.conditional-label {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+}
+
+.conditional-value {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.conditional-detail {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.conditional-insight {
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.conditional-insight p {
+  margin: 0;
+  color: #e2e8f0;
+}
+
+/* ボラティリティ */
+.volatility-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.volatility-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.volatility-label {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+}
+
+.volatility-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* 折れ線グラフ */
+.line-chart-container {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.correlation-line-chart {
+  width: 100%;
+  height: auto;
+}
+
+.chart-dates {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 50px;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .direction-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .direction-card:first-child {
+    grid-column: span 2;
+  }
+  
+  .volatility-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
