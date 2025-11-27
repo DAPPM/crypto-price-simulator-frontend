@@ -219,14 +219,24 @@ function CorrelationTool() {
                   <div className="conditional-value" style={{ color: getCorrelationColor(result.conditional_correlation.correlation_on_up_days) }}>
                     {formatCorrelation(result.conditional_correlation.correlation_on_up_days)}
                   </div>
-                  <div className="conditional-detail">{result.conditional_correlation.up_days_count}日間</div>
+                  <div className="conditional-detail">
+                    {result.conditional_correlation.up_days_count}日間
+                    {result.conditional_correlation.up_reliable === false && (
+                      <span className="low-reliability"> ⚠️ 信頼性低</span>
+                    )}
+                  </div>
                 </div>
                 <div className="conditional-card">
                   <div className="conditional-label">株価下落日の相関</div>
                   <div className="conditional-value" style={{ color: getCorrelationColor(result.conditional_correlation.correlation_on_down_days) }}>
                     {formatCorrelation(result.conditional_correlation.correlation_on_down_days)}
                   </div>
-                  <div className="conditional-detail">{result.conditional_correlation.down_days_count}日間</div>
+                  <div className="conditional-detail">
+                    {result.conditional_correlation.down_days_count}日間
+                    {result.conditional_correlation.down_reliable === false && (
+                      <span className="low-reliability"> ⚠️ 信頼性低</span>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="conditional-insight">
@@ -244,6 +254,9 @@ function CorrelationTool() {
                 </p>
                 {result.conditional_correlation.correlation_on_down_days > result.conditional_correlation.correlation_on_up_days + 0.1 && (
                   <p className="warning">⚠️ 下落時の相関が高い → 暴落時の分散効果は限定的</p>
+                )}
+                {(result.conditional_correlation.up_reliable === false || result.conditional_correlation.down_reliable === false) && (
+                  <p className="note">※ 10日未満のデータは統計的信頼性が低下します</p>
                 )}
               </div>
             </div>
