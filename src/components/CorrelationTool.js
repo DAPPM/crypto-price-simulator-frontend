@@ -140,8 +140,8 @@ function CorrelationTool() {
 
       {result && (
         <div className="result-section">
-          {/* メイン指標 */}
-          <div className="stats-grid">
+          {/* メイン指標 - 2x2グリッド */}
+          <div className="stats-grid-2x2">
             <div className="stat-card">
               <label>現在の相関係数</label>
               <div className="stat-value" style={{ color: getCorrelationColor(result.decoupling.current_correlation) }}>
@@ -230,10 +230,20 @@ function CorrelationTool() {
                 </div>
               </div>
               <div className="conditional-insight">
-                {result.conditional_correlation.correlation_on_down_days > result.conditional_correlation.correlation_on_up_days ? (
-                  <p>⚠️ 株価下落時の方が相関が高い傾向 → リスクオフ時にBTCも売られやすい</p>
-                ) : (
-                  <p>✅ 株価上昇時の方が相関が高い傾向 → 下落時の分散効果が期待できる</p>
+                <p>
+                  <strong>📈 株価上昇日:</strong> 相関 {formatCorrelation(result.conditional_correlation.correlation_on_up_days)}
+                  {result.conditional_correlation.correlation_on_up_days >= 0.3 
+                    ? ' → BTCも上昇しやすい' 
+                    : ' → BTCは独自の動き'}
+                </p>
+                <p>
+                  <strong>📉 株価下落日:</strong> 相関 {formatCorrelation(result.conditional_correlation.correlation_on_down_days)}
+                  {result.conditional_correlation.correlation_on_down_days >= 0.3 
+                    ? ' → BTCも下落しやすい（リスクオフ連動）' 
+                    : ' → BTCは独自の動き（分散効果あり）'}
+                </p>
+                {result.conditional_correlation.correlation_on_down_days > result.conditional_correlation.correlation_on_up_days + 0.1 && (
+                  <p className="warning">⚠️ 下落時の相関が高い → 暴落時の分散効果は限定的</p>
                 )}
               </div>
             </div>
