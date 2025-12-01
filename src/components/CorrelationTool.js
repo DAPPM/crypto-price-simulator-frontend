@@ -10,7 +10,7 @@ function CorrelationTool() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [correlationType, setCorrelationType] = useState('normal'); // 'normal' or 'adjusted'
+  const [correlationType, setCorrelationType] = useState('normal');
 
   const indices = [
     { key: 'sp500', name: 'S&P 500', desc: '米国大型株' },
@@ -75,7 +75,6 @@ function CorrelationTool() {
     return corr.toFixed(3);
   };
 
-  // 選択された相関タイプに応じたデータを取得
   const getCorrelations = () => {
     if (!result) return [];
     return correlationType === 'adjusted' 
@@ -197,13 +196,13 @@ function CorrelationTool() {
                 className={`toggle-btn ${correlationType === 'adjusted' ? 'active' : ''}`}
                 onClick={() => setCorrelationType('adjusted')}
               >
-                ボラ調整済み
+                Zスコア調整
               </button>
             </div>
             <div className="toggle-description">
               {correlationType === 'normal' 
-                ? '※ 1%の動きは1%として比較（一般的な相関）' 
-                : '※ 各資産の普段のボラティリティを基準に標準化して比較'}
+                ? '※ 日次リターンをそのまま比較（一般的な相関分析）' 
+                : '※ 各日のリターンを過去20日のボラティリティ基準でZスコア化して比較（各資産の"異常度"の相関）'}
             </div>
           </div>
 
@@ -352,9 +351,9 @@ function CorrelationTool() {
             </div>
           )}
 
-          {/* 相関推移グラフ（折れ線） */}
+          {/* 相関推移グラフ */}
           <div className="chart-section">
-            <h3>相関係数の推移（{rollingWindow}日ローリング / {correlationType === 'adjusted' ? 'ボラ調整済み' : '通常'}）</h3>
+            <h3>相関係数の推移（{rollingWindow}日ローリング / {correlationType === 'adjusted' ? 'Zスコア調整' : '通常'}）</h3>
             <div className="line-chart-container">
               <svg viewBox="0 0 800 300" className="correlation-line-chart">
                 {/* 背景ゾーン */}
@@ -416,7 +415,7 @@ function CorrelationTool() {
               <li><strong>相関係数 0.3未満:</strong> デカップリング状態。BTCが独自の値動き。</li>
               <li><strong>方向一致率:</strong> 相関係数とは別に、単純に同じ方向（上昇/下落）に動いた日の割合。</li>
               <li><strong>条件付き相関:</strong> 株が上昇した日と下落した日で相関が異なることが多い。下落時に相関が高いと、分散効果が薄れる。</li>
-              <li><strong>通常 vs ボラ調整済み:</strong> 通常は1%を1%として比較。ボラ調整済みは各資産の普段の変動幅を基準に標準化して比較。</li>
+              <li><strong>通常 vs Zスコア調整:</strong> 通常は日次リターンをそのまま比較。Zスコア調整は各資産の「普段の動きと比べた異常度」を比較。</li>
             </ul>
           </div>
         </div>
