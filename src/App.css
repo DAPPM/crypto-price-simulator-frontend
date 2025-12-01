@@ -1163,3 +1163,53 @@ tr:hover td {
   font-style: italic;
   margin-top: 0.5rem;
 }
+/* 相関タイプ切り替え */
+.correlation-type-toggle {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.correlation-type-toggle label {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.toggle-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.toggle-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: transparent;
+  color: #94a3b8;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.toggle-btn:hover {
+  border-color: rgba(139, 92, 246, 0.6);
+  color: #e2e8f0;
+}
+
+.toggle-btn.active {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  border-color: transparent;
+  color: #fff;
+}
+
+.toggle-description {
+  color: #64748b;
+  font-size: 0.8rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}

@@ -10,6 +10,7 @@ function CorrelationTool() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [correlationType, setCorrelationType] = useState('normal'); // 'normal' or 'adjusted'
 
   const indices = [
     { key: 'sp500', name: 'S&P 500', desc: '米国大型株' },
@@ -72,6 +73,48 @@ function CorrelationTool() {
   const formatCorrelation = (corr) => {
     if (corr === null || corr === undefined) return '-';
     return corr.toFixed(3);
+  };
+
+  // 選択された相関タイプに応じたデータを取得
+  const getCorrelations = () => {
+    if (!result) return [];
+    return correlationType === 'adjusted' 
+      ? result.chart_data.std_correlations 
+      : result.chart_data.correlations;
+  };
+
+  const getCurrentCorrelation = () => {
+    const corrs = getCorrelations();
+    const validCorrs = corrs.filter(c => c !== null);
+    return validCorrs.length > 0 ? validCorrs[validCorrs.length - 1] : null;
+  };
+
+  const getAverageCorrelation = () => {
+    const corrs = getCorrelations();
+    const validCorrs = corrs.filter(c => c !== null);
+    if (validCorrs.length === 0) return null;
+    return validCorrs.reduce((a, b) => a + b, 0) / validCorrs.length;
+  };
+
+  const getMinMaxCorrelation = () => {
+    const corrs = getCorrelations();
+    const validCorrs = corrs.filter(c => c !== null);
+    if (validCorrs.length === 0) return { min: null, max: null };
+    return {
+      min: Math.min(...validCorrs),
+      max: Math.max(...validCorrs)
+    };
+  };
+
+  const getDecouplingStats = () => {
+    const corrs = getCorrelations();
+    const validCorrs = corrs.filter(c => c !== null);
+    if (validCorrs.length === 0) return { count: 0, ratio: 0 };
+    const count = validCorrs.filter(c => c < 0.3).length;
+    return {
+      count,
+      ratio: count / validCorrs.length
+    };
   };
 
   return (
@@ -140,30 +183,54 @@ function CorrelationTool() {
 
       {result && (
         <div className="result-section">
+          {/* 相関タイプ切り替え */}
+          <div className="correlation-type-toggle">
+            <label>相関の計算方法:</label>
+            <div className="toggle-buttons">
+              <button
+                className={`toggle-btn ${correlationType === 'normal' ? 'active' : ''}`}
+                onClick={() => setCorrelationType('normal')}
+              >
+                通常
+              </button>
+              <button
+                className={`toggle-btn ${correlationType === 'adjusted' ? 'active' : ''}`}
+                onClick={() => setCorrelationType('adjusted')}
+              >
+                ボラ調整済み
+              </button>
+            </div>
+            <div className="toggle-description">
+              {correlationType === 'normal' 
+                ? '※ 1%の動きは1%として比較（一般的な相関）' 
+                : '※ 各資産の普段のボラティリティを基準に標準化して比較'}
+            </div>
+          </div>
+
           {/* メイン指標 - 2x2グリッド */}
           <div className="stats-grid-2x2">
             <div className="stat-card">
               <label>現在の相関係数</label>
-              <div className="stat-value" style={{ color: getCorrelationColor(result.decoupling.current_correlation) }}>
-                {result.decoupling.current_correlation?.toFixed(3) || '-'}
+              <div className="stat-value" style={{ color: getCorrelationColor(getCurrentCorrelation()) }}>
+                {formatCorrelation(getCurrentCorrelation())}
               </div>
-              <div className="stat-label">{getCorrelationLabel(result.decoupling.current_correlation)}</div>
+              <div className="stat-label">{getCorrelationLabel(getCurrentCorrelation())}</div>
             </div>
             <div className="stat-card">
               <label>平均相関係数</label>
               <div className="stat-value">
-                {result.decoupling.average_correlation?.toFixed(3) || '-'}
+                {formatCorrelation(getAverageCorrelation())}
               </div>
               <div className="stat-label">
-                最小: {result.decoupling.min_correlation?.toFixed(3)} / 最大: {result.decoupling.max_correlation?.toFixed(3)}
+                最小: {formatCorrelation(getMinMaxCorrelation().min)} / 最大: {formatCorrelation(getMinMaxCorrelation().max)}
               </div>
             </div>
             <div className="stat-card">
               <label>デカップリング状態</label>
-              <div className="stat-value" style={{ color: result.decoupling.is_decoupled ? '#ef4444' : '#22c55e' }}>
-                {result.decoupling.is_decoupled ? 'Yes' : 'No'}
+              <div className="stat-value" style={{ color: getCurrentCorrelation() < 0.3 ? '#ef4444' : '#22c55e' }}>
+                {getCurrentCorrelation() < 0.3 ? 'Yes' : 'No'}
               </div>
-              <div className="stat-label">低相関期間: {(result.decoupling.decoupling_ratio * 100).toFixed(1)}%</div>
+              <div className="stat-label">低相関期間: {(getDecouplingStats().ratio * 100).toFixed(1)}%</div>
             </div>
             <div className="stat-card">
               <label>期間リターン</label>
@@ -287,7 +354,7 @@ function CorrelationTool() {
 
           {/* 相関推移グラフ（折れ線） */}
           <div className="chart-section">
-            <h3>相関係数の推移（{rollingWindow}日ローリング）</h3>
+            <h3>相関係数の推移（{rollingWindow}日ローリング / {correlationType === 'adjusted' ? 'ボラ調整済み' : '通常'}）</h3>
             <div className="line-chart-container">
               <svg viewBox="0 0 800 300" className="correlation-line-chart">
                 {/* 背景ゾーン */}
@@ -315,10 +382,10 @@ function CorrelationTool() {
                   stroke="#8b5cf6"
                   strokeWidth="2"
                   points={
-                    result.chart_data.correlations
+                    getCorrelations()
                       .map((corr, i) => {
                         if (corr === null) return null;
-                        const x = 50 + (i / (result.chart_data.correlations.length - 1)) * 730;
+                        const x = 50 + (i / (getCorrelations().length - 1)) * 730;
                         const y = 140 - (corr * 120);
                         return `${x},${y}`;
                       })
@@ -349,6 +416,7 @@ function CorrelationTool() {
               <li><strong>相関係数 0.3未満:</strong> デカップリング状態。BTCが独自の値動き。</li>
               <li><strong>方向一致率:</strong> 相関係数とは別に、単純に同じ方向（上昇/下落）に動いた日の割合。</li>
               <li><strong>条件付き相関:</strong> 株が上昇した日と下落した日で相関が異なることが多い。下落時に相関が高いと、分散効果が薄れる。</li>
+              <li><strong>通常 vs ボラ調整済み:</strong> 通常は1%を1%として比較。ボラ調整済みは各資産の普段の変動幅を基準に標準化して比較。</li>
             </ul>
           </div>
         </div>
